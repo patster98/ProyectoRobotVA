@@ -1,9 +1,9 @@
-import yaml
+import yaml #https://geekflare.com/es/python-yaml-intro/
 import numpy as np
 import cv2
 
 # buscar archivo que tiene matriz
-a_yaml_file = open(r"C:\Users\Computers VR\PycharmProjects\URProyecto\calibration_matrix.yaml")
+a_yaml_file = open(r'calibration_matrix.yaml')
 parsed_yaml_file = yaml.load(a_yaml_file, Loader=yaml.FullLoader)
 mtx = np.array(parsed_yaml_file["camera_matrix"])
 dist = np.array(parsed_yaml_file["dist_coeff"])
