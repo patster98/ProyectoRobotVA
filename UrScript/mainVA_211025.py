@@ -25,11 +25,13 @@ def invert_point(x):
   result = np.array(result)
   return result
 
-def draw_circle_with_text(img, x, y, label):
+def draw_circle_with_text(img, x, y, label,grad):
   cv2.circle(img, (x, y), 7, (255, 255, 255), -1)
-  cv2.putText(img, label, (x - 20, y - 20),
+  cv2.putText(img, label, (x - 20, y - 40),
               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-  cv2.putText(img, "(" + str(x) + ", " + str(y) + ")", (x - 20, y - 40),
+  cv2.putText(img, "C: "+ grad, (x + 20, y - 20),
+              cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+  cv2.putText(img,"C: "+ "(" + str(x) + " px" ", " + str(y) + " px" ")", (x - 20, y - 60),
               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
 def obtain_contour(img):
@@ -120,10 +122,10 @@ while True:
             #output center of contour
             #print  (P1x , P2y, angle)
 
-            draw_circle_with_text(perpendicular_img, cX, cY, "(" + str(x_cm) + ", " + str(y_cm) + ") cm , " + str(angle) + " gr")
+            draw_circle_with_text(perpendicular_img, cX, cY, "(" + str(x_cm) + " cm" ", " + str(y_cm) + " cm" ")",  str(angle) + "gr")
 
             inverted_point = invert_point([[cX, cY]])[0]
-            draw_circle_with_text(frame, inverted_point[0], inverted_point[1], "(" + str(x_cm) + ", " + str(y_cm) + ") cm")
+            draw_circle_with_text(frame, inverted_point[0], inverted_point[1], "(" + str(x_cm) + ", " + str(y_cm) + ") cm", "")
 
         draw_axis(frame, perpendicular_img)
         cv2.imshow("Homography ", perpendicular_img)
