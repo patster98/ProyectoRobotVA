@@ -27,9 +27,9 @@ def invert_point(x):
 
 def draw_circle_with_text(img, x, y, label,grad):
   cv2.circle(img, (x, y), 7, (255, 255, 255), -1)
-  cv2.putText(img, label, (x - 20, y - 40),
+  cv2.putText(img,"C: "+ label, (x - 20, y - 40),
               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-  cv2.putText(img, "C: "+ grad, (x + 20, y - 20),
+  cv2.putText(img, grad, (x + 20, y - 20),
               cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
   cv2.putText(img,"C: "+ "(" + str(x) + " px" ", " + str(y) + " px" ")", (x - 20, y - 60),
               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
@@ -51,7 +51,6 @@ def obtain_contour(img):
                                          cv2.CHAIN_APPROX_SIMPLE)  # encuetra los contornos, chain aprox simple une algunos puntos para que no sea discontinuo.
   return max(contours, key=cv2.contourArea)  # Agarra el contorno de area maxima
 
-
 def draw_axis(frame, perpendicular_img):
   draw_lines(perpendicular_img, (0,0),(width, 0), (0, height), (width - 50, 20), (20, height - 50))
   inverted_origin = invert_point([[0, 0]])[0]
@@ -62,16 +61,13 @@ def draw_axis(frame, perpendicular_img):
   draw_lines(frame, to_tuple(inverted_origin),to_tuple(x_axis), to_tuple(y_axis), to_tuple(x_text), to_tuple(y_text))
 
 
-
-
-
 from h_matrix import obtain_h_matrix
 from undistort import camara_undistort
 
 width, height = 500, 500
 width_cm, height_cm = 40,40
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
 
 global h_mat
 global inverse_h_mat
@@ -132,6 +128,7 @@ while True:
 
     cv2.imshow("Live Image ", frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
+
         break
 
 
