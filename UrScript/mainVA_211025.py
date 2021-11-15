@@ -61,7 +61,7 @@ def draw_axis(frame, perpendicular_img):
   draw_lines(frame, to_tuple(inverted_origin),to_tuple(x_axis), to_tuple(y_axis), to_tuple(x_text), to_tuple(y_text))
 
 
-from h_matrix import obtain_h_matrix
+from h_matrix import obtain_h_matrix, robot_matrix
 from undistort import camara_undistort
 
 width, height = 500, 500
@@ -73,7 +73,7 @@ global h_mat
 global inverse_h_mat
 h_mat = []
 inverse_h_mat = []
-
+img_counter = 0
 
 while True:
 
@@ -83,6 +83,11 @@ while True:
     if cv2.waitKey(1) == ord('c'):
         h_mat = obtain_h_matrix(frame)
         inverse_mat = cv2.invert(h_mat)[1]
+        matrizRob, puntosImg = robot_matrix(frame)
+        print(matrizRob)
+        point = [263,414]
+        coordRobot = np.dot(matrizRob, point)
+        print(coordRobot)
 
     if(len(h_mat) != 0):
         perpendicular_img = cv2.warpPerspective(frame, h_mat, ((width, height)))
@@ -127,6 +132,12 @@ while True:
         cv2.imshow("Homography ", perpendicular_img)
 
     cv2.imshow("Live Image ", frame)
+    if cv2.waitKey(1) == ord(' '):
+         # SPACE pressed
+        img_name = "opencv_frame_{}.png".format(img_counter)
+        cv2.imwrite(img_name, perpendicular_img)
+        print("{} written!".format(img_name))
+        img_counter += 1
     if cv2.waitKey(1) & 0xFF == ord('q'):
 
         break
