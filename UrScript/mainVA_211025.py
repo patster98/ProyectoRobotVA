@@ -60,14 +60,17 @@ def draw_axis(frame, perpendicular_img):
   x_text = invert_point([[width + 50, 20]])[0]
   draw_lines(frame, to_tuple(inverted_origin),to_tuple(x_axis), to_tuple(y_axis), to_tuple(x_text), to_tuple(y_text))
 
+def NormalizeVector(v):
+    normVec = [v[0]/v[2],v[1]/v[2],v[2]/v[2]]
+    return normVec
 
 from h_matrix import obtain_h_matrix, robot_matrix
 from undistort import camara_undistort
 
 width, height = 500, 500
-width_cm, height_cm = 40,40
+width_cm, height_cm = 39.5,37.5
 
-cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(1,cv2.CAP_DSHOW)
 
 global h_mat
 global inverse_h_mat
@@ -83,11 +86,9 @@ while True:
     if cv2.waitKey(1) == ord('c'):
         h_mat = obtain_h_matrix(frame)
         inverse_mat = cv2.invert(h_mat)[1]
-        matrizRob, puntosImg = robot_matrix(frame)
-        print(matrizRob)
-        point = [263,414]
-        coordRobot = np.dot(matrizRob, point)
-        print(coordRobot)
+        matrizRob = robot_matrix(frame)
+        print("matriz rob", matrizRob)
+
 
     if(len(h_mat) != 0):
         perpendicular_img = cv2.warpPerspective(frame, h_mat, ((width, height)))
@@ -100,8 +101,20 @@ while True:
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
 
-            x_cm = width_cm * cX / width
-            y_cm = height_cm * cY / height
+            if cv2.waitKey(1) & 0xFF == ord(" "):
+                # coord homog del centro de pieza en las coord de la img warpeada
+                warpPoint = np.append([cX,cY], [1])
+                coordHomog = np.dot(matrizRob, warpPoint)
+                coordRobot = NormalizeVector(coordHomog)
+                print("Vector homografía: ", coordHomog)
+                print("Vector robot: ", coordRobot)
+            # coord homog del centro de pieza en las coord de la img warpeada
+            warpPoint = np.append([cX, cY], [1])
+            coordHomog = np.dot(matrizRob, warpPoint)
+            coordRobot = NormalizeVector(coordHomog)
+
+            x_mm = np.round(coordRobot[0],5)*1000
+            y_mm = np.round(coordRobot[1],5)*1000
 
             original_contours = inverse_contour_points(shape_contour)
             cv2.drawContours(frame, [original_contours], -1, (255, 0, 255), 3)
@@ -120,24 +133,14 @@ while True:
             #draw vector line
             cv2.line(perpendicular_img,(cX, cY),(P2x,P2y),(255,255,255),5)
 
-            #output center of contour
-            #print  (P1x , P2y, angle)
-
-            draw_circle_with_text(perpendicular_img, cX, cY, "(" + str(x_cm) + " cm" ", " + str(y_cm) + " cm" ")",  str(angle) + "gr")
-
             inverted_point = invert_point([[cX, cY]])[0]
-            draw_circle_with_text(frame, inverted_point[0], inverted_point[1], "(" + str(x_cm) + ", " + str(y_cm) + ") cm", "")
+            draw_circle_with_text(perpendicular_img, cX, cY, "(" + str(x_mm) + " mm" ", " + str(y_mm) + " mm" ")", str(angle) + "gr")
+            draw_circle_with_text(frame, inverted_point[0], inverted_point[1], "(" + str(x_mm) + ", " + str(y_mm) + ") mm", "")
 
         draw_axis(frame, perpendicular_img)
         cv2.imshow("Homography ", perpendicular_img)
 
     cv2.imshow("Live Image ", frame)
-    if cv2.waitKey(1) == ord(' '):
-         # SPACE pressed
-        img_name = "opencv_frame_{}.png".format(img_counter)
-        cv2.imwrite(img_name, perpendicular_img)
-        print("{} written!".format(img_name))
-        img_counter += 1
     if cv2.waitKey(1) & 0xFF == ord('q'):
 
         break
