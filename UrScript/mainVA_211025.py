@@ -64,6 +64,7 @@ def NormalizeVector(v):
     normVec = [v[0]/v[2],v[1]/v[2],v[2]/v[2]]
     return normVec
 
+from mainRobot import robot
 from h_matrix import obtain_h_matrix, robot_matrix
 from undistort import camara_undistort
 
@@ -72,13 +73,14 @@ width_cm, height_cm = 39.5,37.5
 
 cap = cv2.VideoCapture(1,cv2.CAP_DSHOW)
 
+contador = 0
 global h_mat
 global inverse_h_mat
 h_mat = []
 inverse_h_mat = []
 img_counter = 0
 
-while True:
+while contador<5:
 
     ret, raw = cap.read()
     frame = camara_undistort(raw)
@@ -127,6 +129,10 @@ while True:
             P1y = cY
             length = 35
 
+            if cv2.waitKey(1) & 0xFF == ord('b'):
+                contador = robot(coordRobot[0], coordRobot[1],angle,contador)
+                print("angle: ", angle)
+
             #calculate vector line at angle of bounding box
             P2x = int(P1x + length * np.cos(np.radians(angle)))
             P2y = int(P1y + length * np.sin(np.radians(angle)))
@@ -144,7 +150,4 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
 
         break
-
-
-cap.release()
 cv2.destroyAllWindows()
