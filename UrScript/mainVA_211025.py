@@ -1,4 +1,6 @@
 import math
+import time
+
 import numpy as np
 import cv2
 def draw_lines(img, origin, x_axis, y_axis, x_text, y_text):
@@ -74,6 +76,7 @@ width_cm, height_cm = 39.5,37.5
 cap = cv2.VideoCapture(1,cv2.CAP_DSHOW)
 
 contador = 0
+M1 = 0
 global h_mat
 global inverse_h_mat
 h_mat = []
@@ -97,11 +100,14 @@ while contador<5:
 
         shape_contour = obtain_contour(perpendicular_img)
         if(cv2.contourArea(shape_contour) > 1000):
+            MaxCont = shape_contour
             cv2.drawContours(perpendicular_img, [shape_contour], -1, (255, 0, 255), 3)
 
-            M = cv2.moments(shape_contour)
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
+            M2 = cv2.moments(shape_contour)
+            cX = int(M2["m10"] / M2["m00"])
+            cY = int(M2["m01"] / M2["m00"])
+            # time.sleep(1)
+
 
             if cv2.waitKey(1) & 0xFF == ord(" "):
                 # coord homog del centro de pieza en las coord de la img warpeada
@@ -129,9 +135,12 @@ while contador<5:
             P1y = cY
             length = 35
 
-            if cv2.waitKey(1) & 0xFF == ord('b'):
+            if M2["m00"]==M1:
                 contador = robot(coordRobot[0], coordRobot[1],angle,contador)
                 print("angle: ", angle)
+            else:
+                M1 = M2["m00"]
+                print("Momento: ", M2["m00"])
 
             #calculate vector line at angle of bounding box
             P2x = int(P1x + length * np.cos(np.radians(angle)))
