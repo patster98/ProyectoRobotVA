@@ -1,6 +1,4 @@
 import math
-import time
-
 import numpy as np
 import cv2
 def draw_lines(img, origin, x_axis, y_axis, x_text, y_text):
@@ -101,7 +99,7 @@ while True:
         perpendicular_img = cv2.warpPerspective(frame, h_mat, ((width, height)))
 
         shape_contour = obtain_contour(perpendicular_img)
-        if(cv2.contourArea(shape_contour) > 1000):
+        if(cv2.contourArea(shape_contour) > 5000):
             MaxCont = shape_contour
             cv2.drawContours(perpendicular_img, [shape_contour], -1, (255, 0, 255), 3)
 
@@ -161,7 +159,9 @@ while True:
         cv2.imshow("Homography ", perpendicular_img)
 
     cv2.imshow("Live Image ", frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-
+    if cv2.waitKey(1) & 0xFF == ord('q') or contador==4:
+        # Close robot connection
+        print("Closing robot connection")
         break
 cv2.destroyAllWindows()
+raise SystemExit
