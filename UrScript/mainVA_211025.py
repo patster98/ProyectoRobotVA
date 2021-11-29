@@ -70,12 +70,14 @@ from mainRobot import robot
 from h_matrix import obtain_h_matrix, robot_matrix
 from undistort import camara_undistort
 
+
 width, height = 500, 500
 width_cm, height_cm = 39.5,37.5
 
 cap = cv2.VideoCapture(1,cv2.CAP_DSHOW)
 
 contador = 0
+finish=True
 M1 = 0
 global h_mat
 global inverse_h_mat
@@ -83,7 +85,7 @@ h_mat = []
 inverse_h_mat = []
 img_counter = 0
 
-while contador<5:
+while True:
 
     ret, raw = cap.read()
     frame = camara_undistort(raw)
@@ -104,6 +106,7 @@ while contador<5:
             cv2.drawContours(perpendicular_img, [shape_contour], -1, (255, 0, 255), 3)
 
             M2 = cv2.moments(shape_contour)
+
             cX = int(M2["m10"] / M2["m00"])
             cY = int(M2["m01"] / M2["m00"])
             # time.sleep(1)
@@ -135,9 +138,11 @@ while contador<5:
             P1y = cY
             length = 35
 
-            if M2["m00"]==M1:
-                contador = robot(coordRobot[0], coordRobot[1],angle,contador)
+            if M2["m00"]==M1 and finish:
+                finish=False
+                contador,finish = robot(coordRobot[0], coordRobot[1],angle,contador)
                 print("angle: ", angle)
+
             else:
                 M1 = M2["m00"]
                 print("Momento: ", M2["m00"])

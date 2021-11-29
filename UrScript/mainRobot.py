@@ -6,12 +6,14 @@ import urx
 from Regression import regresion_x as rx, regresion_y as ry
 from urx.robotiq_two_finger_gripper import Robotiq_Two_Finger_Gripper
 
+rob = urx.Robot("192.168.0.16")
+gripper = Robotiq_Two_Finger_Gripper(rob)
 
 
 def robot(x, y, angle, contador):
+
     contador +=1
-    rob = urx.Robot("192.168.0.16")
-    gripper = Robotiq_Two_Finger_Gripper(rob)
+
 
 
     try:
@@ -28,7 +30,7 @@ def robot(x, y, angle, contador):
                    1.5372142791748047]
 
         a = 0.3
-        v = 0.5
+        v = 0.7
 
         print("Moving to ", pose_in)
         rob.movej(pose_in, a, v, wait=True)
@@ -49,7 +51,7 @@ def robot(x, y, angle, contador):
         rob.set_pose(t, a, v)
 
         pose_gripper = [0, 0, z, 0, 0, 0]
-        subir=[0, 0, 0.4, 0, 0, 0]
+        subir=[0, 0, 0.3, 0, 0, 0]
 
 
         print("Moving to ", pose_gripper)
@@ -70,9 +72,14 @@ def robot(x, y, angle, contador):
         print("Moving to ", pose_gripper)
         rob.movel(subir, a, v, wait=True, relative=True)
 
-    finally:
-        # Close robot connection
-        print("Closing robot connection")
-        rob.close()
 
-    return contador
+
+
+    finally:
+        # # Close robot connection
+        # print("Closing robot connection")
+        # rob.close()
+        finish = True
+
+
+    return contador,finish
